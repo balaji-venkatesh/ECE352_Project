@@ -2,3 +2,6 @@
 
 [Project Overview](https://www.youtube.com/watch?v=TWZiudul_ws&ab_channel=AliHadizadeh)
 
+
+## steps in modelsim
+1) Run `compile.do`
