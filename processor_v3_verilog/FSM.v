@@ -19,13 +19,14 @@
 
 module FSM
 (
-reset, instr, clock,
+reset, instr, clock, snot, //!!!6
 N, Z,
 PCwrite, AddrSel, MemRead,
 MemWrite, IRload, R1Sel, MDRload,
 R1R2Load, ALU1, ALU2, ALUop,
 ALUOutWrite, RFWrite, RegIn, FlagWrite//, state
 );
+	input 	snot; //!!!6
 	input	[3:0] instr;
 	input	N, Z;
 	input	reset, clock;
@@ -39,20 +40,25 @@ ALUOutWrite, RFWrite, RegIn, FlagWrite//, state
 	reg	R1R2Load, ALU1, ALUOutWrite, RFWrite, RegIn, FlagWrite;
 	reg	[2:0] ALU2, ALUop;
 	
+	reg [15:0] counter;
 	
 	// state constants (note: asn = add/sub/nand, asnsh = add/sub/nand/shift)
 	parameter [3:0] reset_s = 0, c1 = 1, c2 = 2, c3_asn = 3,
 					c4_asnsh = 4, c3_shift = 5, c3_ori = 6,
 					c4_ori = 7, c5_ori = 8, c3_load = 9, c4_load = 10,
-					c3_store = 11, c3_bpz = 12, c3_bz = 13, c3_bnz = 14;
+					c3_store = 11, c3_bpz = 12, c3_bz = 13, c3_bnz = 14, c3_stop = 15; // !!!2
 	
 	// determines the next state based upon the current state; supports
 	// asynchronous reset
 	always @(posedge clock or posedge reset)
 	begin
-		if (reset) state = reset_s;
+		if (reset) begin
+			state = reset_s;
+			counter = 0;
+		end
 		else
 		begin
+			counter = counter + 1; //!!!8 
 			case(state)
 				reset_s:	state = c1; 		// reset state
 				c1:			state = c2; 		// cycle 1
@@ -65,6 +71,7 @@ ALUOutWrite, RFWrite, RegIn, FlagWrite//, state
 								else if( instr == 4'b1101 ) state = c3_bpz;
 								else if( instr == 4'b0101 ) state = c3_bz;
 								else if( instr == 4'b1001 ) state = c3_bnz;
+								else if( instr == 4'b0001 ) state = c3_stop; // !!!1 
 								else state = 0;
 							end
 				c3_asn:		state = c4_asnsh;	// cycle 3: ADD SUB NAND
@@ -79,6 +86,14 @@ ALUOutWrite, RFWrite, RegIn, FlagWrite//, state
 				c3_bpz:		state = c1; 		// cycle 3: BPZ
 				c3_bz:		state = c1; 		// cycle 3: BZ
 				c3_bnz:		state = c1; 		// cycle 3: BNZ
+				c3_stop:	begin
+								if( snot == 1'b0 ) begin
+									counter = counter - 1;
+									state = c3_stop;	// !!!3		
+								end
+								else if( snot == 1'b1 ) state = c1; // !!!7
+								else state = 0;
+							end
 			endcase
 		end
 	end
@@ -392,6 +407,24 @@ ALUOutWrite, RFWrite, RegIn, FlagWrite//, state
 					R1R2Load = 0;
 					ALU1 = 0;
 					ALU2 = 3'b010;
+					ALUop = 3'b000;
+					ALUOutWrite = 0;
+					RFWrite = 0;
+					RegIn = 0;
+					FlagWrite = 0;
+				end
+			c3_stop:	//!!!4
+				begin
+					PCwrite = 0;
+					AddrSel = 0;
+					MemRead = 0;
+					MemWrite = 0;
+					IRload = 0;
+					R1Sel = 0;
+					MDRload = 0;
+					R1R2Load = 0;
+					ALU1 = 0;
+					ALU2 = 3'b000;
 					ALUop = 3'b000;
 					ALUOutWrite = 0;
 					RFWrite = 0;
