@@ -6,7 +6,7 @@
         {
             "label": "assemble",
             "type": "shell",
-            "command": "cd processor_v3_verilog; ../multicycle_assembler/asm.exe ${file}",
+            "command": "cd programs; ./asm.exe ${file}",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
