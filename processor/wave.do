@@ -1,16 +1,7 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate -radix unsigned /multicycle_tb/DUT/Control/state
-add wave -noupdate /multicycle_tb/DUT/Control/instr
-add wave -noupdate /multicycle_tb/DUT/Control/snot
-add wave -noupdate -radix unsigned /multicycle_tb/DUT/Control/counter
 add wave -noupdate /multicycle_tb/reset
 add wave -noupdate /multicycle_tb/clock
-add wave -noupdate -divider {Registers}
-add wave -noupdate -radix hexadecimal /multicycle_tb/DUT/RF_block/k0
-add wave -noupdate -radix hexadecimal /multicycle_tb/DUT/RF_block/k1
-add wave -noupdate -radix hexadecimal /multicycle_tb/DUT/RF_block/k2
-add wave -noupdate -radix hexadecimal /multicycle_tb/DUT/RF_block/k3
 add wave -noupdate -divider {Hex Display}
 add wave -noupdate -radix hexadecimal /multicycle_tb/DUT/HEX_display/in0
 add wave -noupdate -radix hexadecimal /multicycle_tb/DUT/HEX_display/in1
