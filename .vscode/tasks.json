@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "echo",
+            "label": "assemble",
             "type": "shell",
             "command": "cd processor_v3_verilog; ../multicycle_assembler/asm.exe ${file}",
             "problemMatcher": [],

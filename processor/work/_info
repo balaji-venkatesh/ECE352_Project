@@ -9,7 +9,7 @@ z2
 cModel Technology
 Z0 dC:/Users/b/Desktop/School/Y3/T1/ECE352/ECE352_Project/processor_v3_verilog
 vALU
-Z1 !s110 1669070461
+Z1 !s110 1669071314
 !i10b 1
 !s100 iaU79UW^_[P^VJamSBHEO3
 I@1hcEM6<h^UC1_XiP>;en0
@@ -23,7 +23,7 @@ Z3 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z4 !s108 1669070461.000000
+Z4 !s108 1669071314.000000
 !s107 ALU.v|
 !s90 -reportprogress|300|-vlog01compat|-work|work|ALU.v|
 !i113 1
@@ -67,7 +67,7 @@ R3
 r1
 !s85 0
 31
-R4
+Z14 !s108 1669071313.000000
 !s107 DataMemory.v|
 !s90 -reportprogress|300|-vlog01compat|-work|work|DataMemory.v|
 !i113 1
@@ -75,7 +75,7 @@ R5
 R6
 n@data@memory
 vDualMem
-R1
+Z15 !s110 1669071313
 !i10b 1
 !s100 6RcA0izhdUlj=8C7m=9QV1
 Ica63W<8R<__GEImfMliNk1
@@ -89,7 +89,7 @@ R3
 r1
 !s85 0
 31
-Z14 !s108 1669070460.000000
+R14
 !s107 DualMem.v|
 !s90 -reportprogress|300|-vlog01compat|-work|work|DualMem.v|
 !i113 1
@@ -97,13 +97,13 @@ R5
 R6
 n@dual@mem
 vFSM
-Z15 !s110 1669070462
+R1
 !i10b 1
 !s100 9hdc05VAR[m9nd7]i7gRO3
 I0Ic8lh?0za?76iFMk6oIe1
 R2
 R0
-w1669070389
+w1669070629
 8FSM.v
 FFSM.v
 Z16 L0 20
@@ -111,7 +111,7 @@ R3
 r1
 !s85 0
 31
-Z17 !s108 1669070462.000000
+R4
 !s107 FSM.v|
 !s90 -reportprogress|300|-vlog01compat|-work|work|FSM.v|
 !i113 1
@@ -163,7 +163,7 @@ R5
 R6
 n@h@e@xs
 vmemory
-Z18 !s110 1669070460
+R15
 !i10b 1
 !s100 o;c;NTe;eW0D82@o;_No:3
 IX]5Je1n4ieSoZALojQc>G0
@@ -184,7 +184,7 @@ R14
 R5
 R6
 vmulticycle
-R18
+R15
 !i10b 1
 !s100 Ma>]HSeNF=?dCe40o7o:W0
 I>REZ6V7PS9k9cGI3Ojko]3
@@ -205,7 +205,7 @@ R14
 R5
 R6
 vmulticycle_tb
-R15
+R1
 !i10b 1
 !s100 25CdB6AhFW5gJA]1OB]<@1
 I669g@6TXETjo5>P^z?dbG0
@@ -219,20 +219,20 @@ R3
 r1
 !s85 0
 31
-R17
+R4
 !s107 multicycle_tb.v|
 !s90 -reportprogress|300|-vlog01compat|-work|work|multicycle_tb.v|
 !i113 1
 R5
 R6
 vmux2to1_2bit
-R18
+R15
 !i10b 1
 !s100 Z66z64?`6Q5>]NPB]lc2>3
 I3c76ZiXK[5e_P:]^[JAGF2
 R2
 R0
-Z19 w1383076132
+Z17 w1383076132
 8mux2to1_2bit.v
 Fmux2to1_2bit.v
 L0 3
@@ -247,7 +247,7 @@ R14
 R5
 R6
 vmux2to1_8bit
-R18
+R15
 !i10b 1
 !s100 BZg1:jJh9<O:md=c5ND<53
 I5lh?Ui4MSJ<`j5Eno2EIG2
@@ -268,13 +268,13 @@ R14
 R5
 R6
 vmux5to1_8bit
-R18
+R15
 !i10b 1
 !s100 3`nhCTm^G63GCg447DAJ83
 IYCZYj7005Z[DKR>;PnQ[A1
 R2
 R0
-R19
+R17
 8mux5to1_8bit.v
 Fmux5to1_8bit.v
 L0 3
@@ -338,17 +338,17 @@ R1
 IzN:X:12YNbB[Ch:aa`I;O1
 R2
 R0
-Z20 w1181107738
-Z21 8extend.v
-Z22 Fextend.v
+Z18 w1181107738
+Z19 8extend.v
+Z20 Fextend.v
 L0 38
 R3
 r1
 !s85 0
 31
 R4
-Z23 !s107 extend.v|
-Z24 !s90 -reportprogress|300|-vlog01compat|-work|work|extend.v|
+Z21 !s107 extend.v|
+Z22 !s90 -reportprogress|300|-vlog01compat|-work|work|extend.v|
 !i113 1
 R5
 R6
@@ -360,17 +360,17 @@ R1
 ICV6P5n`2cBac_a_`O3@9T0
 R2
 R0
+R18
+R19
 R20
-R21
-R22
 R10
 R3
 r1
 !s85 0
 31
 R4
-R23
-R24
+R21
+R22
 !i113 1
 R5
 R6
