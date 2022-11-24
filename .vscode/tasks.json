@@ -6,7 +6,7 @@
         {
             "label": "assemble",
             "type": "shell",
-            "command": "cd programs; ./asm.exe ${file}",
+            "command": "cd compiler; ./python.exe compiler.py ${file} ${fileDirname}\\data.mif",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
