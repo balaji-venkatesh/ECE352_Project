@@ -81,7 +81,7 @@ assign HEX7 = 7'b1111111;
 */
 
 FSM		Control(
-	.reset(reset),.clock(clock),.N(N),.Z(Z),.instr(IR[3:0]),
+	.reset(reset),.clock(clock),.N(N),.Z(Z),.instr(IR[3:0]),.snot(IR[7]), //!!!5
 	.PCwrite(PCWrite),.AddrSel(AddrSel),.MemRead(MemRead),.MemWrite(MemWrite),
 	.IRload(IRLoad),.R1Sel(R1Sel),.MDRload(MDRLoad),.R1R2Load(R1R2Load),
 	.ALU1(ALU1),.ALUOutWrite(ALUOutWrite),.RFWrite(RFWrite),.RegIn(RegIn),
