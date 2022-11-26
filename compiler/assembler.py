@@ -20,7 +20,6 @@ def assembler(inFilename, outFilename, memFilename): # main assembler
 	for lineNum, line in enumerate(assembly): # read labels
 		firstPass(line, labels, preproc, lineNum) # lineNum is used for error reporting
 	preproc = [([labels.get(arg, arg) for arg in line[0]],line[1]) for line in preproc]
-	print('\n'.join([str(l) for l in preproc])) #!!!
 	binary = [0]*DEPTH # binary output
 	address = 0
 	for line, lineNum in preproc: # encode! (third pass)
@@ -59,6 +58,7 @@ def assembler(inFilename, outFilename, memFilename): # main assembler
 		with open(outFilename, 'w') as outF: outF.write(out)
 		with open(memFilename, 'w') as memF: memF.write(mem)
 	except OSError as err: error(err)
+
 	print(f'Success!\n\nCompiled {inFilename} to {outFilename} and {memFilename}\n')
 
 def firstPass(line, labels, preproc, lineNum): # read labels, rem empty lines
