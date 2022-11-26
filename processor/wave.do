@@ -2,6 +2,13 @@ onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate /multicycle_tb/reset
 add wave -noupdate /multicycle_tb/clock
+add wave -noupdate /multicycle_tb/DUT/reg0
+add wave -noupdate /multicycle_tb/DUT/reg1
+add wave -noupdate /multicycle_tb/DUT/reg2
+add wave -noupdate /multicycle_tb/DUT/reg3
+add wave -noupdate /multicycle_tb/DUT/Control/instr
+add wave -noupdate /multicycle_tb/DUT/Control/state
+add wave -noupdate /multicycle_tb/DUT/Control/snot
 add wave -noupdate -divider {Hex Display}
 add wave -noupdate -radix hexadecimal /multicycle_tb/DUT/HEX_display/in0
 add wave -noupdate -radix hexadecimal /multicycle_tb/DUT/HEX_display/in1
