@@ -1,4 +1,4 @@
-import sys, re
+import sys, re # written by Balaji Venkatesh
 
 DEPTH = 256
 DUAL_REG_INSTR = {'LOAD': 0b0000, 'STORE': 0b0010, 'ADD': 0b0100, 'SUB':0b0110, 'NAND': 0b1000,
@@ -13,23 +13,23 @@ def assembler(inFilename, outFilename, memFilename): # main assembler
 		with open(inFilename, 'r') as inF: assembly = inF.read()
 	except OSError as err: error(err)
 	# upper, split row and col, remove commas/parantheses/comments
-	assembly = [line.partition(';')[0].strip().split() for line in re.sub(',|\(|\)',' ', assembly).upper().splitlines()]
+	assembly = [line.partition(';')[0].strip().split() for line in re.sub(':|,|\(|\)',' ', assembly).upper().splitlines()]
 	
 	preproc = [] # preprocessed stuff
 	labels = {} # label list
 	for lineNum, line in enumerate(assembly): # read labels
 		firstPass(line, labels, preproc, lineNum) # lineNum is used for error reporting
 	preproc = [([labels.get(arg, arg) for arg in line[0]],line[1]) for line in preproc]
-
+	print('\n'.join([str(l) for l in preproc])) #!!!
 	binary = [0]*DEPTH # binary output
 	address = 0
-	for (line, lineNum) in preproc: # encode! (third pass)
+	for line, lineNum in preproc: # encode! (third pass)
 		try:
 			if address > DEPTH: error('Not enough memory for this many instructions', lineNum)
 			elif line[0] in DUAL_REG_INSTR:
 				binary[address] = register(line[1]) << 6 | register(line[2]) << 4 |	DUAL_REG_INSTR[line[0]]
 			elif line[0] in BRANCH_INSTR:
-				binary[address] = immediate(4, line[1]) << 4 | BRANCH_INSTR[line[0]]
+				binary[address] = immediate(4,line[1]-address-1) << 4 | BRANCH_INSTR[line[0]]
 			elif line[0] == "ORI":
 				binary[address] = immediate(5,line[1]) << 3 | 0b111
 			elif line[0] == "SHIFT":
@@ -59,7 +59,6 @@ def assembler(inFilename, outFilename, memFilename): # main assembler
 		with open(outFilename, 'w') as outF: outF.write(out)
 		with open(memFilename, 'w') as memF: memF.write(mem)
 	except OSError as err: error(err)
-
 	print(f'Success!\n\nCompiled {inFilename} to {outFilename} and {memFilename}\n')
 
 def firstPass(line, labels, preproc, lineNum): # read labels, rem empty lines
@@ -67,7 +66,7 @@ def firstPass(line, labels, preproc, lineNum): # read labels, rem empty lines
 	if line[0] in NAMESPACE: preproc.append((line,lineNum))
 	else: # we found a label!
 		if line[0] in labels: error(f'Label "{line[0]}" already exists', lineNum)
-		labels[line[0]] = str(len(preproc))
+		labels[line[0]] = len(preproc)
 		firstPass(line[1:], labels, preproc, lineNum) # continue on the remaining line
 
 def register(k): # register parser
@@ -76,6 +75,7 @@ def register(k): # register parser
 
 def immediate(n, imm): # immediate parser: IMMn(j)
 	try: # deal with bases
+		imm = str(imm)
 		if imm.startswith('0B'): i = int(imm.removeprefix('0B'),2)
 		elif imm.startswith('0X'): i = int(imm.removeprefix('0X'),16)
 		elif imm.startswith('0'): i = int(imm,8)
@@ -87,9 +87,8 @@ def immediate(n, imm): # immediate parser: IMMn(j)
 	if(i.bit_length() > n or i < 0): raise ValueError(f'"{imm}" cannot be represented as IMM{n}') 
 	return i
 
-def error(error, lineNum = None): # error reporter
-	if lineNum : print(f'\n[Error, line {lineNum+1}] {error}\n')
-	else: print(f'\n[Error] {error}\n')
+def error(err, lineNum = None): # error reporter
+	print(f'\n[Error, line {lineNum+1}] {err}\n' if lineNum else f'\n[Error] {err}\n')
 	sys.exit()
 
 if __name__ == '__main__': # commandline argument logic block
@@ -97,4 +96,5 @@ if __name__ == '__main__': # commandline argument logic block
 		print('\nusage: python compiler.py in [out] [mem]\nArguments:\nin:  input assembly file (required)'\
 			+'\nout: output file 1 (default:"data.mid")\nmem: output file 2 (default: out+".mem")\n')
 		sys.exit()
-	assembler(sys.argv[1], sys.argv[2] if len(sys.argv)>=3 else 'data.mif',  sys.argv[3] if len(sys.argv)>=4 else 'data.mif.mem')
+	out = sys.argv[2] if len(sys.argv)>=3 else 'data.mif'
+	assembler(sys.argv[1], out, sys.argv[3] if len(sys.argv)>=4 else out+'.mem')
