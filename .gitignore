@@ -2,3 +2,12 @@ processor/work/
 processor/data.ver
 processor/vsim.wlf
 processor/data.mif*
+processor/db
+processor/incremental_db
+multicycle.*.rpt
+multicycle.*.summary
+multicycle.pin
+multicycle.fit.smsg
+multicycle.jdi
+multicycle.sld
+multicycle.sof

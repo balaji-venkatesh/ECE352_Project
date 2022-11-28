@@ -163,7 +163,7 @@ ALUOutWrite, RFWrite, RegIn, FlagWrite//, state
 								PCwrite = 0;
 								AddrSel = 0;
 								MemRead = 0;
-								MemWrite = 0;
+								MemWrite = 0; 
 								IRload = 0;
 								R1Sel = 0;
 								MDRload = 0;
