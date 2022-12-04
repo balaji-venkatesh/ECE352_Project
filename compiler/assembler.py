@@ -5,7 +5,7 @@ DUAL_REG_INSTR = {'LOAD': 0b0000, 'STORE': 0b0010, 'ADD': 0b0100, 'SUB':0b0110, 
 	'VLOAD': 0b1010, 'VADD': 0b1110, 'VSTORE': 0b1100}
 BRANCH_INSTR = {'BZ':0b0101, 'BNZ':0b1001, 'BPZ':0b1101}
 NAMESPACE = ['LOAD','STORE','ADD','SUB','VLOAD','VADD','VSTORE','NAND','BZ','BNZ','BPZ','ORI',
-	'SHIFT','SHIFTL','SHIFTR','STOP','NOP','K1','K2','K3','K4','X1','X2','X3','X4','DB','ORG']
+	'SHIFT','SHIFTL','SHIFTR','STOP','NOP','K0','K1','K2','K3','V0','V1','V2','V3','DB','ORG']
 
 def assembler(inFilename, outFilename, memFilename): # main assembler
 
@@ -70,7 +70,7 @@ def firstPass(line, labels, preproc, lineNum): # read labels, rem empty lines
 		firstPass(line[1:], labels, preproc, lineNum) # continue on the remaining line
 
 def register(k): # register parser
-	try: return {"K0":0b00,"K1":0b01,"K2":0b10,"K3":0b11}[k]
+	try: return {"K0":0b00,"K1":0b01,"K2":0b10,"K3":0b11,"V0":0b00,"V1":0b01,"V2":0b10,"V3":0b11}[k]
 	except KeyError: raise ValueError(f'Invalid register "{k}"') from None
 
 def immediate(n, imm): # immediate parser: IMMn(j)

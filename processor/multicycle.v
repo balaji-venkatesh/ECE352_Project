@@ -40,7 +40,7 @@ output reg [17:0] LEDR;
 // ------------------------- Registers/Wires ------------------------ //
 wire	clock, reset;
 wire	IRLoad, MDRLoad, MemRead, MemWrite, PCWrite, RegIn, AddrSel;
-wire	ALU1, ALUOutWrite, FlagWrite, R1R2Load, R1Sel, RFWrite;
+wire	ALU1, ALUOutWrite, FlagWrite, R1Load, R2Load, R1Sel, RFWrite;
 wire	[7:0] R2wire, PCwire, R1wire, RFout1wire, RFout2wire;
 wire	[7:0] ALU1wire, ALU2wire, ALUwire, ALUOut, MDRwire, MEMwire;
 wire	[7:0] IR, SE4wire, ZE5wire, ZE3wire, AddrWire, RegWire;
@@ -50,6 +50,14 @@ wire	[2:0] ALUOp, ALU2;
 wire	[1:0] R1_in;
 wire	Nwire, Zwire;
 reg		N, Z;
+
+wire	VRFWrite, X1Load, X2Load, VoutSel, T0Ld, T1Ld, T2Ld, T3Ld, R2Sel;
+wire	[31:0] VRegWire, VRFout1wire, VRFout2wire;
+wire 	[7:0] X10wire,X11wire,X12wire,X13wire,X20wire,X21wire,X22wire,X23wire;
+wire 	[7:0] addX10X20, addX11X21, addX12X22, addX13X23;
+wire	[7:0] T0MuxOut_wire, T1MuxOut_wire, T2MuxOut_wire, T3MuxOut_wire;
+wire	[7:0] MemMux_wire, R2plus1_wire, R2in_wire;
+wire	[2:0] MemIn;
 
 // ------------------------ Input Assignment ------------------------ //
 assign	clock = KEY[1];
@@ -83,9 +91,11 @@ assign HEX7 = 7'b1111111;
 FSM		Control(
 	.reset(reset),.clock(clock),.N(N),.Z(Z),.instr(IR[3:0]),.snot(IR[7]), //!!!5
 	.PCwrite(PCWrite),.AddrSel(AddrSel),.MemRead(MemRead),.MemWrite(MemWrite),
-	.IRload(IRLoad),.R1Sel(R1Sel),.MDRload(MDRLoad),.R1R2Load(R1R2Load), // !!!!
+	.IRload(IRLoad),.R1Sel(R1Sel),.MDRload(MDRLoad),.R1Load(R1Load),.R2Load(R2Load), // !!!!
 	.ALU1(ALU1),.ALUOutWrite(ALUOutWrite),.RFWrite(RFWrite),.RegIn(RegIn),
-	.FlagWrite(FlagWrite),.ALU2(ALU2),.ALUop(ALUOp)
+	.FlagWrite(FlagWrite),.ALU2(ALU2),.ALUop(ALUOp),
+	.MemIn(MemIn),.R2Sel(R2Sel),.VRFWrite(VRFWrite),.X1Load(X1Load),.X2Load(X2Load),
+	.T0Ld(T0Ld),.T1Ld(T1Ld),.T2Ld(T2Ld),.T3Ld(T3Ld),.VoutSel(VoutSel)
 );
 
 memory	DataMem(
@@ -110,7 +120,7 @@ RF		RF_block(
 VRF		VRF_block(
 	.clock(clock),.reset(reset),.VRFWrite(VRFWrite),
 	.vdataw(VRegWire),.vreg1(IR[7:6]),.vreg2(IR[5:4]),
-	.vregw(IR[7:6]),.vdata1(VRFout1wire),.vdata2(VRFout2wire),
+	.vregw(IR[7:6]),.vdata1(VRFout1wire),.vdata2(VRFout2wire)
 	//.v0(vreg0),.v1(vreg1),.v2(vreg2),.v3(vreg3)
 );
 
@@ -149,19 +159,19 @@ mux2to1_8bit 		T3_mux(
 );
 
 register_8bit	T0(
-	.clock(clock),.aclr(reset),.enable(T0ld),
+	.clock(clock),.aclr(reset),.enable(T0Ld),
 	.data(T0MuxOut_wire),.q(VRegWire[7:0])
 );
 register_8bit	T1(
-	.clock(clock),.aclr(reset),.enable(T1ld),
+	.clock(clock),.aclr(reset),.enable(T1Ld),
 	.data(T1MuxOut_wire),.q(VRegWire[15:8])
 );
 register_8bit	T2(
-	.clock(clock),.aclr(reset),.enable(T2ld),
+	.clock(clock),.aclr(reset),.enable(T2Ld),
 	.data(T2MuxOut_wire),.q(VRegWire[23:16])
 );
 register_8bit	T3(
-	.clock(clock),.aclr(reset),.enable(T3ld),
+	.clock(clock),.aclr(reset),.enable(T3Ld),
 	.data(T3MuxOut_wire),.q(VRegWire[31:24])
 );
 
@@ -176,13 +186,6 @@ mux2to1_8bit 		R2_mux(
 	.data0x(RFout2wire),.data1x(R2plus1_wire), // meme wire
 	.sel(R2Sel),.result(R2in_wire)
 );
-
-wire	VRFWrite, X1Load, X2Load, VoutSel, T0ld, T1ld, T2ld, T3ld, MemIn, R2Sel;
-wire	[31:0] VRegWire, VRFout1wire, VRFout2wire;
-wire 	[7:0] X10wire,X11wire,X12wire,X13wire,X20wire,X21wire,X22wire,X23wire;
-wire 	[7:0] addX10X20, addX11X21, addX12X22, addX13X23;
-wire	[7:0] T0MuxOut_wire, T1MuxOut_wire, T2MuxOut_wire, T4MuxOut_wire;
-wire	[7:0] MemMux_wire, R2plus1_wire, R2in_wire;
 
 // !!! additions end here !!!
 
@@ -201,14 +204,14 @@ register_8bit	PC(
 	.data(ALUwire),.q(PCwire)
 );
 
-register_8bit	R1(
-	.clock(clock),.aclr(reset),.enable(R1R2Load),
+register_8bit	R1( // !!!
+	.clock(clock),.aclr(reset),.enable(R1Load),
 	.data(RFout1wire),.q(R1wire)
 );
 
-register_8bit	R2(
-	.clock(clock),.aclr(reset),.enable(R1R2Load),
-	.data(RFout2wire),.q(R2wire)
+register_8bit	R2( // !!!
+	.clock(clock),.aclr(reset),.enable(R2Load),
+	.data(R2in_wire),.q(R2wire)
 );
 
 register_8bit	ALUOut_reg(
@@ -274,8 +277,8 @@ begin
     case({SW[4],SW[3]})
     2'b00:
     begin
-      LEDR[9] = 0;
-      LEDR[8] = 0;
+      LEDR[9] = R1Load;
+      LEDR[8] = R2Load;
       LEDR[7] = PCWrite;
       LEDR[6] = AddrSel;
       LEDR[5] = MemRead;
@@ -283,7 +286,7 @@ begin
       LEDR[3] = IRLoad;
       LEDR[2] = R1Sel;
       LEDR[1] = MDRLoad;
-      LEDR[0] = R1R2Load;
+      LEDR[0] = 0;
     end
 
     2'b01:
