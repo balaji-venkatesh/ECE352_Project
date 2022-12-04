@@ -11,17 +11,6 @@
 - [Project Overview Video](https://www.youtube.com/watch?v=TWZiudul_ws)
 - To test a new assembly program on the board with no change to processor hardware, use `processor/UPDATE_MIF.bat`.
 
-## Changes from Original
-
-1) add stop instruction `0001` to `FSM.v`
-2) add stop state `c3_stop = 15` to `FSM.v`
-3) add next stop state `c3_stop   state = c3_stop` <- it's a loop!
-4) add stop controls, same as default
-5) add a channel for the first bit in the instruction to check for stop/nop (in `multicycle.v`)
-6) add a channel for the first bit in the instruction to check for stop/nop (in `FSM.v`)
-7) add a switcher what the next state is for stop/nop
-8) 
-
 ## Instruction Set Architecture
 
 - `IMM5`: 5-bit unsigned
