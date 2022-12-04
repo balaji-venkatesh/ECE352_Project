@@ -83,14 +83,14 @@ assign HEX7 = 7'b1111111;
 FSM		Control(
 	.reset(reset),.clock(clock),.N(N),.Z(Z),.instr(IR[3:0]),.snot(IR[7]), //!!!5
 	.PCwrite(PCWrite),.AddrSel(AddrSel),.MemRead(MemRead),.MemWrite(MemWrite),
-	.IRload(IRLoad),.R1Sel(R1Sel),.MDRload(MDRLoad),.R1R2Load(R1R2Load),
+	.IRload(IRLoad),.R1Sel(R1Sel),.MDRload(MDRLoad),.R1R2Load(R1R2Load), // !!!!
 	.ALU1(ALU1),.ALUOutWrite(ALUOutWrite),.RFWrite(RFWrite),.RegIn(RegIn),
 	.FlagWrite(FlagWrite),.ALU2(ALU2),.ALUop(ALUOp)
 );
 
 memory	DataMem(
 	.MemRead(MemRead),.wren(MemWrite),.clock(clock),
-	.address(AddrWire),.data(R1wire),.q(MEMwire)
+	.address(AddrWire),.data(MemMux_wire),.q(MEMwire) // !!! addition
 );
 
 ALU		ALU(
@@ -104,6 +104,87 @@ RF		RF_block(
 	.regw(R1_in),.data1(RFout1wire),.data2(RFout2wire),
 	.r0(reg0),.r1(reg1),.r2(reg2),.r3(reg3)
 );
+
+// !!! additions start here !!!
+
+VRF		VRF_block(
+	.clock(clock),.reset(reset),.VRFWrite(VRFWrite),
+	.vdataw(VRegWire),.vreg1(IR[7:6]),.vreg2(IR[5:4]),
+	.vregw(IR[7:6]),.vdata1(VRFout1wire),.vdata2(VRFout2wire),
+	//.v0(vreg0),.v1(vreg1),.v2(vreg2),.v3(vreg3)
+);
+
+register_32bit	X1(
+	.clock(clock),.aclr(reset),.enable(X1Load),
+	.data(VRFout1wire),
+	.q0(X10wire),.q1(X11wire),.q2(X12wire),.q3(X13wire)
+);
+register_32bit	X2(
+	.clock(clock),.aclr(reset),.enable(X2Load),
+	.data(VRFout2wire),
+	.q0(X20wire),.q1(X21wire),.q2(X22wire),.q3(X23wire)
+);
+
+// odders
+assign addX10X20 = X10wire + X20wire;
+assign addX11X21 = X11wire + X21wire;
+assign addX12X22 = X12wire + X22wire;
+assign addX13X23 = X13wire + X23wire;
+
+mux2to1_8bit 		T0_mux(
+	.data0x(addX10X20),.data1x(MEMwire), // meme wire
+	.sel(VoutSel),.result(T0MuxOut_wire)
+);
+mux2to1_8bit 		T1_mux(
+	.data0x(addX11X21),.data1x(MEMwire), // meme wire
+	.sel(VoutSel),.result(T1MuxOut_wire)
+);
+mux2to1_8bit 		T2_mux(
+	.data0x(addX12X22),.data1x(MEMwire), // meme wire
+	.sel(VoutSel),.result(T2MuxOut_wire)
+);
+mux2to1_8bit 		T3_mux(
+	.data0x(addX13X23),.data1x(MEMwire), // meme wire
+	.sel(VoutSel),.result(T3MuxOut_wire)
+);
+
+register_8bit	T0(
+	.clock(clock),.aclr(reset),.enable(T0ld),
+	.data(T0MuxOut_wire),.q(VRegWire[7:0])
+);
+register_8bit	T1(
+	.clock(clock),.aclr(reset),.enable(T1ld),
+	.data(T1MuxOut_wire),.q(VRegWire[15:8])
+);
+register_8bit	T2(
+	.clock(clock),.aclr(reset),.enable(T2ld),
+	.data(T2MuxOut_wire),.q(VRegWire[23:16])
+);
+register_8bit	T3(
+	.clock(clock),.aclr(reset),.enable(T3ld),
+	.data(T3MuxOut_wire),.q(VRegWire[31:24])
+);
+
+mux5to1_8bit 	MemMux(
+	.data0x(X10wire),.data1x(X11wire),.data2x(X12wire),.data3x(X13wire),
+	.data4x(R1wire),.sel(MemIn),.result(MemMux_wire)
+);
+
+assign R2plus1_wire = R2wire + 1;
+
+mux2to1_8bit 		R2_mux(
+	.data0x(RFout2wire),.data1x(R2plus1_wire), // meme wire
+	.sel(R2Sel),.result(R2in_wire)
+);
+
+wire	VRFWrite, X1Load, X2Load, VoutSel, T0ld, T1ld, T2ld, T3ld, MemIn, R2Sel;
+wire	[31:0] VRegWire, VRFout1wire, VRFout2wire;
+wire 	[7:0] X10wire,X11wire,X12wire,X13wire,X20wire,X21wire,X22wire,X23wire;
+wire 	[7:0] addX10X20, addX11X21, addX12X22, addX13X23;
+wire	[7:0] T0MuxOut_wire, T1MuxOut_wire, T2MuxOut_wire, T4MuxOut_wire;
+wire	[7:0] MemMux_wire, R2plus1_wire, R2in_wire;
+
+// !!! additions end here !!!
 
 register_8bit	IR_reg(
 	.clock(clock),.aclr(reset),.enable(IRLoad),
